@@ -1,0 +1,44 @@
+WE752 Run Notes
+
+Exercise 1. Using DataPower to implement REST services
+
+DataPower gateway to expose web services with JSON data and a REST interface.
+After completing this exercise, you should be able to:
+• Create a service policy to handle JSON and REST requests and responses
+• Use a GatewayScript to build a SOAP request from HTTP query parameters or JSON
+• Enable and use the CLI debugger
+• Define and use stylesheet parameters
+• Convert a SOAP response to a JSON-formatted data structure by using XQuery/JSONiq
+
+<dp_FLY_baggage_port> - 2068
+<dp_FLY_booking_port> - 9080
+
+<mpgw_baggage_port>: 12nn9
+listener port of the BaggageServiceProxy
+1.1. Initialize the lab environment
+ Appendix B - SOAPUI test on existing services:
+- Web Service Test - Baggage
+- 00 – Web Service Test - Booking
+
+1.2. Compare the REST interface to the SOAP interface of the back-end web service
+
+1.3. The high-level design of the REST service
+
+1.4. Create a multi-protocol gateway service that handles a JSON request
+BaggageServiceProxy
+- http_fsh_Baggage_12nn9 <mpgw_baggage_port>
+- be: http://dp_internal_ip:2068/BaggageService
+- BaggageServicePolicy
+
+Validate:  REST/BaggageStatus-schema.json.
+Transform: REST/BaggageJson2Soap.js
+identity.xsl
+
+"__ 18. If the Transform action (“xformng”) is down ..." not such a problem on 7.5.2.2.
+
+
+1.5. Test the BaggageServiceProxy by sending a JSON request
+* Ensure NOT using "SOAPUI Baggage REST GET"
+* In the response tab, be sure to click the JSON view tab.
+
+1.6. Test the Validate action in BaggageServiceProxy
