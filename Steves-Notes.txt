@@ -1,7 +1,0 @@
-WE752
-
-Uses SOAPUI / Ubuntu 14.04.
-
-As of September 2016, the environment that is used to support the IBM-supplied images and DataPower gateways is Skytap.
-Each student is supplied an Ubuntu student image and a DataPower gateway.
-The supplied image is Ubuntu 14.04 LTS.

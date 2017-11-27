@@ -1,0 +1,17 @@
+WE752
+
+Uses SOAPUI / Ubuntu 14.04. /cURL
+
+As of September 2016, the environment that is used to support the IBM-supplied images and DataPower gateways is Skytap.
+Each student is supplied an Ubuntu student image and a DataPower gateway.
+The supplied image is Ubuntu 14.04 LTS.
+
+Exercise Comparison
+WE752 = BaggagServiceProxy MPGW (JSON / SOAP / JSON) + WE712 (JWS, JWE)
+In WE752 student builds BaggagServiceProxy.
+In WE712 BaggagServiceProxy is prebuilt in BaggagServiceProxy domain.
+
+WE752 Exercise 1 uses SOAPUI.
+WE752 Exercise 2 uses cURL.
+WE752 Exercise 3 uses cURL.
+WE752 Exercise 4 uses cURL.

@@ -40,5 +40,228 @@ identity.xsl
 1.5. Test the BaggageServiceProxy by sending a JSON request
 * Ensure NOT using "SOAPUI Baggage REST GET"
 * In the response tab, be sure to click the JSON view tab.
+#queryJohnson  -OK
 
 1.6. Test the Validate action in BaggageServiceProxy
+#misslastname, #refNoString - both invalid
+
+1.7. Use the stylesheet parameter in the GatewayScript action
+gatewayscript-user entries in log
+
+1.8. Use the CLI GatewayScript debugger
+ssh dp_internal_ip
+switch domain some student domain
+co
+show debug-actions (gives Session ID values, etc.)
+debug-action <session_id>
+
+1.9. Add a REST interface to the baggage status request (i.e. wasn't a GET)
+- now no content, just URI
+rule: BaggageServicePolicy_BagsByPassenger_Req
+
+1.10. Test the REST interface for Baggage Status
+- * note deliberate error initial: new rule needs to go above AllURI rule.
+
+1.11. Add new REST interface to find a specific bag
+rule: BaggageServicePolicy_FindBag_Req
+*** Name the MATCH*: FindBag_Req
+rule: BaggageServicePolicy_FindBag_Resp / FindBag_Resp match
+
+1.12. Test the retrieval by bag ID
+
+Exercise 2. Creating and verifying a JWS
+----------------------------------------
+Section 2. Test the back-end services
+This is BaggageServiceProxy on <mpgw_baggage_port>: 12nn9
+
+cd /usr/labfiles/dp/JWS
+
+2.2 Use cURL to test the REST-based GET request
+curl -G "http://192.168.1.75:12009/BaggageService/Passenger/Bags?refNumber=11111&lastName=Johnson"
+
+2.3 Use cURL to test the POST request that passes a JSON object
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:12009/BaggageService
+- RefnumLastnameRequest.txt = {"refNumber" : 11111, "lastName" : "Johnson
+
+Section 3. Import the key material objects and files
+
+Section 4. Create a compact serialized JWS
+In this section, you create the SignEncryptJOSE MPGW / HTTP Handler: SignEncryptJOSE_http_13nn1
+
+Section 5. Test the compact serialized JWS generation
+curl --data-binary @URIstring.txt http://192.168.1.75:13001/SignURIcompact > SignedURIcompactJWS.txt
+=
+eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA
+- base64 decode (dot separates three sections):
+  - {"alg":"RS256","kid":"Sam"}			Protected header
+  - refNumber=11111&lastName=Johnson	Payload
+  - (non-standard chars)				Signature
+
+Section 6. Verify a compact serialized JWS
+Irrelevant diagram under section __ 18
+
+VerifyDecryptJOSE MPGW / HTTP Handler: VerifyDecryptJOSE_http_13nn3
+
+
+*** _29. Specify a Rule Name of "Generic Response" and set the direction to Server to Client.
+- no space allowed in name use _ between
+
+
+Section 7. Test the compact serialized JWS verification and call the back-end baggage service
+OK:
+curl -G "http://192.168.1.75:13003/VerifyURIcompact?eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA"
+- returns with application JSON result
+NOT OK:
+curl -G "http://192.168.1.75:13003/VerifyURIcompact?eyJhbGciZZZSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA"
+- fails
+
+Section 8. Generate a JSON serialized JWS with a single signature
+modify SignEncryptJOSE MPGW to create a JSON serialized JWS.
+"Serialization to Flattened JSON. You can use this value because the JWS contains only one signature."
+
+Section 9. Test the JSON serialized JWS generation
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignBodyJSON > SignedBodyJSONJWS.txt
+
+{"payload":"ew0KICAicmVmTnVtYmVyIiA6IDExMTExLA0KICAibGFzdE5hbWUiIDogIkpvaG5zb24iDQp9","signatures":[{"protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9","signature":"eyCZRK5FbQYmw_xpVVUqTfSWQFATgH1bk4dFjVnH2jXkZta4tRRaLdB-hQvjWBCzWliAej3aVgAF01pyKYGlUD1eKYWYvf2M4V5VJrp-ZjdXRR0SA_Fvk4U-D233VHKKhYHWfD_upMYtaTzVTY1F7n2v0XtgtSFDzPzXWXtnaNowjBxIrttl1-JCu5yFdIWUdM7pLJEGuKRWVzn1420myE4rdRtCqWOmGiIfmpno6VTmxmZIc7VMtArgwsuXcp1sGkyi_i9pxdDYYYv06khkjx_WIGl6jhGTbCnK81n1exYxcL7skGIDsVy0RClSksyVld6e4nozCK_EwwawuqJRDA"}]}
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx = base64 encoded of {"refNumber" : 11111, "lastName" : "Johnson"}
+{"payload":"ew0KICAicmVmTnVtYmVyIiA6IDExMTExLA0KICAibGFzdE5hbWUiIDogIkpvaG5zb24iDQp9","signatures":[{"protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9","signature":"eyCZRK5FbQYmw_xpVVUqTfSWQFATgH1bk4dFjVnH2jXkZta4tRRaLdB-hQvjWBCzWliAej3aVgAF01pyKYGlUD1eKYWYvf2M4V5VJrp-ZjdXRR0SA_Fvk4U-D233VHKKhYHWfD_upMYtaTzVTY1F7n2v0XtgtSFDzPzXWXtnaNowjBxIrttl1-JCu5yFdIWUdM7pLJEGuKRWVzn1420myE4rdRtCqWOmGiIfmpno6VTmxmZIc7VMtArgwsuXcp1sGkyi_i9pxdDYYYv06khkjx_WIGl6jhGTbCnK81n1exYxcL7skGIDsVy0RClSksyVld6e4nozCK_EwwawuqJRDA"}]}
+                                                                                       xxxxxxxxxx
+                                                                                
+Section 10. Verify a JSON serialized, single signature JWS
+modify VerifyDecryptJOSE MPGW to verify this form of the JWS
+
+Section 11. Test the JSON serialized JWS verification and call the back-end baggage service
+curl --data-binary @SignedBodyJSONJWS.txt http://192.168.1.75:13003/VerifyBodyJSON
+- verification action converts the {"payload": "xxx", "signatures": "xxx"} into {"refNumber" : 11111, "lastName" : "Johnson"}
+  which is the format the backend is expecting
+- returns application JSON
+
+Section 12. Generate a JSON serialized JWS with multiple signatures
+modify SignEncryptJOSE MPGW to create a JSON serialized JWS with two signatures.
+The JSON Web Sign action does not support multiple signatures, a GatewayScript provides the function.
+
+Section 13. Test the JSON serialized JWS generation for multiple signatures
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignBodyMultiSigJSON > SignedBodyMultiSigJSONJWS.txt
+{"payload":"ew0KICAicmVmTnVtYmVyIiA6IDExMTExLA0KICAibGFzdE5hbWUiIDogIkpvaG5zb24iDQp9",
+    "signatures":[
+        {"protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9","signature":"eyCZRK5FbQYmw_xpVVUqTfSWQFATgH1bk4dFjVnH2jXkZta4tRRaLdB-hQvjWBCzWliAej3aVgAF01pyKYGlUD1eKYWYvf2M4V5VJrp-ZjdXRR0SA_Fvk4U-D233VHKKhYHWfD_upMYtaTzVTY1F7n2v0XtgtSFDzPzXWXtnaNowjBxIrttl1-JCu5yFdIWUdM7pLJEGuKRWVzn1420myE4rdRtCqWOmGiIfmpno6VTmxmZIc7VMtArgwsuXcp1sGkyi_i9pxdDYYYv06khkjx_WIGl6jhGTbCnK81n1exYxcL7skGIDsVy0RClSksyVld6e4nozCK_EwwawuqJRDA"},
+        {"protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNldGgifQ","signature":"He-e0LOgpY5xHBU23TmWQWj1taMvHNXQ-dbkOeKLKhcM7yHQBQcbWO2iuT83B_v-s8IGSET-ukX2x0XbOLaI8PquKKYxzmSsra_1CobgIkNZP2SrlyrcQGOhdBA4AkudnHrpNEkU31Ufgpvog-f2-bPjgs5lKVv3uJlrhUePXdbsFAb2JFeJoB--iQ_wiFaYhcP8Q2doZ3F_0XLdujW1b1OMYeYpXSISkLCzaHYQX0l9oSOiWaMRHkGQ7JJ3eVViKY_FEmOT7ewgSgvqm-ECUI77uePkIHB-CgpSJcYB9xdEQI5ILYhD71SnHNgATrGS7aBF18fh2xu_RTsQcXkgpA"}]}
+- 2 signatures
+- "protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9"	: value base64 decoded is {"alg":"RS256","kid":"Sam"}
+- "protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNldGgifQ"	: value base64 decoded is {"alg":"RS256","kid":"Seth"}
+
+Section 14. Verify a JSON serialized, multi-signature JWS
+modify VerifyDecryptJOSE MPGW to verify this form of the JWS
+- add also a new Signature Identifier SethSig
+
+Section 15. Test the JSON serialized, multi-signature JWS verification and call the back-end baggage service
+curl --data-binary @SignedBodyMultiSigJSONJWS.txt http://192.168.1.75:13003/VerifyBodyMultiSigJSON
+- verification action converts the {"payload": "xxx", "signatures": "xxx"} into {"refNumber" : 11111, "lastName" : "Johnson"}
+  which is the format the backend is expecting
+- returns application JSON
+
+=====================================================================================================
+Exercise 3. Creating and decrypting a JWE
+Section 2. Create a compact serialized JWE
+modify SignEncryptJOSE MPGW to create a compact serialized JWE.
+
+Section 3. Test the compact serialized JWE generation
+cd ... /JWE
+curl --data-binary @URIstring.txt http://192.168.1.75:13001/EncryptURIcompact > EncryptedURIcompactJWE.txt
+- returns
+eyJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiRW1pIiwiYWxnIjoiUlNBMV81In0.g0o1ynFRfqryiar5zN0TCrr-S2zBDbLyDqd1-egiMZTLRooatdIE7yNlGOqPNVEjQUMFTGiut0VBrifu60YYCh-qgKJbIvRBYxAewputnr2s9p8vineKI9IcmYslGoB0ZPxCEI5wbQeUrcV8X-O8JOTR6Ya1zpTjBkdl0ZQ99RrkJOIadKQhRoxbJhswfmEM9LREMbgsIBe_v-gEt-I_gAyYJJ5vgJlOtMjJtWCfb47fA6Q-tIlzdGoBmwrc4mKteRqtFQG_LWwSeJf8VKmMMpRihKUjFkUbTHJob17bPUAKsWwrI2u6qiD-ZURPb3LKXAM88hhkCFfgCVdFAi4KnQ.AMJFAGqNZMFKOTmRqnjazA.i6h62j0WXlB6_tsfbRAc--aLUMwYoK4FQsDCBPswl9Qh80hgxUV_fDV1CDz7-vnB.-gJ-rz23WDYpFaA8cF0L9Q
+
+Section 4. Decrypt a compact serialized JWE
+modify VerifyDecryptJOSE MPGW to decrypt a compact serialized JWE
+
+Section 5. Test the compact serialized JWE decryption and call the back-end baggage service
+The portion after '?' is the serialized JWE generated above
+curl -G "http://192.168.1.75:13003/DecryptURIcompact?eyJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiRW1pIiwiYWxnIjoiUlNBMV81In0.AwNea0n0wo8wbfZJVQIkcr9yDb_dReQlbwO1VH-Z90jqLsHtEhaDXns4wBOs5q70UCFaLXK1p9C4p186bRuS9-exJTJXDwiXUjHVYL5LaMwDLp6wseoEwcdc97l2Mmd3jhHOzGmiO8BstzWV3N_UjykKAjuStS-hEQcKvkObhWB7XBOA6FhrHYPTtIdYt3EFrftuY--HkjbBkCP13nuKl6lUoW-KEWlJg24dMmCRI82yW06XR5pIIiTvzsDk2HNNDeusPhhiw3W20S-i1HmLJvMebB7xt-M4dNyX1YrxNPbMPPUe3gDX_aaHf975JL_dIjyklkCp1ms-UTAhwFm6mg.eegzT2kada7aVNktZ9_0kw.YFxa21NPiJwOm-VpfALDNc6UxKiN3dUTqMXPn64ro6BHOuB6NB5WToWoySt-sGOz.gbHjNZMF8UKAPnFZFrLWVg"
+- decryption converts the JWE in the URI into {"refNumber" : 11111, "lastName" : "Johnson"}
+  which is the format the backend is expecting
+- returns application JSON
+
+Section 6. Generate a JSON serialized JWE with a single recipient
+A JSON serialized JWE is expected to be passed in an HTTP body, not the URI.
+Modify the SignEncryptJOSE MPGW to create a JSON serialized JWE.
+
+Section 7. Test the JSON serialized JWE generation
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/EncryptBodyJSON > EncryptedBodyJSONJWE.txt
+- returns
+{"recipients":[{"header":{"kid":"Emi"},"encrypted_key":"XE6Ai12VBtWxXcO0LHD558CpE3DoN9o1udBc3f9U4JjfOhJVbViDmpODNuu8zsbeYOwCb26YLCpv1i7sxT1GCATZpJoa0VOCl08axjR9F_TSMfdyvknXBCmiT1d3Oq-dFB-Dcj_Auty47YGjR86y-W6Mum4gdriWGSyAbDRHjDurax4XrWd9E5PUC4YwZ8VYC72yFKeuOga53prAqSCfHIx1kEci4M0UM06NdygkVY9X7y_l4Rs-_XGExebFsDOgctVp1Tb8vifRgkcXlFlQXs4pmjNLXejYfpOS4xsnhsG_tsNx2UzgdsjfPiSX9ray08E2o6gBqNsD6ZCtWGmgvQ"}],"protected":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBMV81In0","ciphertext":"LI-voLRjxU5JvZwjzaQ0c2bUf40objeCAk_hyT_-u6rXbDMEvfDXj8hA5uFj1lpoR8osVILtagtOODowKlhBqA","iv":"lDI3J_pVOBQyC9I4efaTgA","tag":"j6bCqYR0Eh70yrw04Cbiww"}
+"The protected header decodes as “{"enc":"A128CBC-HS256","alg":"RSA1_5"}”, is actually the "protected" value.
+
+Section 8. Decrypt a JSON serialized, single-recipient JWE
+
+Section 9. Test the JSON serialized, single-recipient JWE decryption and call the back-end baggage service
+curl --data-binary @EncryptedBodyJSONJWE.txt http://192.168.1.75:13003/DecryptBodyJSON
+- decryption converts the JWE in the Body into {"refNumber" : 11111, "lastName" : "Johnson"}
+  which is the format the backend is expecting
+- returns application JSON
+
+Section 10. Generate a JSON serialized JWE with multiple recipients
+modify the SignEncryptJOSE MPGW to create a JSON serialized JWE that contains two recipients.
+Because the JSON Web Encrypt action does not support multiple signatures, use a GatewayScript
+
+Section 11. Test the JSON serialized JWE generation for multiple recipients
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/BuildMultiRecipientJWE > MultiRecipientJWE.txt
+- returns
+{"recipients":[{"header":{"kid":"Emi","alg":"RSA1_5"},"encrypted_key":"KXNJckgY_2z_vDPydSVnYGUf0zVJwJcBaUQ2kxVeukQ7C7aVgusNpJsmLTFDNCesk6fJcexNSlSonQJEns5c9aC0b-cVD_QwapB2JAUtXFsNBsDtNYCCpiFxowhBwpFTeZPR52wjwOusDl8chnG_qYdBh_8QRaRgrLT0ztGP8X11jFQLV_B-qvNghsb8silAY8jyroGOt0Nqh3MZ9_DMFK-FSt6nTUg6y_sqanFxwjfw9KxtGh3HCup3Ber_CJY1buiONRDm5b_f_JofHibf7MGiTLN6xKp_gbxt9CrSDjrOQTY3oBwYu_A3ipCUiqCPS3GnKrOlyl7RIe4p5GAZkQ"},{"header":{"kid":"Erin","alg":"RSA-OAEP"},"encrypted_key":"Eie8ssMNN_ArkNQRTGgtQzS-gXS9hAUP59XUXhjBVO7eddW1byJyI1PPkFn7-dwwsFCasdtDqPB95eUdZHAhrgLrIj4BlZxWDDoMhbdrw0_qjg2f4-fNJ-ATcVFjZSDkzCiJk9A7WmLuhfbLsjM2YhxhleYGnlxVS_gCQJqvKPvM23EYw2BdWhr8OmHBz0cdyWv8w9tHTzN6vNvxTB6nkfvfR_pQ3t-2rA-nI4gO4M86ljf2TgFRR9VK5bNurFPoV08fRs9sL5_-AFdyGjW2oUvqCJbeScu4umoZPAuMtB_7b5lQqtNR4CzYudr_lSZWs_yGJrvg2Qv0ehYv1K2JuA"}],"protected":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0","ciphertext":"jBFvcv1RGVpwbsEJt3Mr4ByaG1MgPSry8WHY0iUbLHbzm_HaCAbMnQs0U2tN4j0rW-zcOF71GOQInYW6oDlyqg","iv":"TS5qdkag8INXkkRe_yqFqg","tag":"T31dBKN653CNg_SnmRTIEQ"}
+- has data for 2 recipients
+
+Section 12. Decrypt a JSON serialized, multi-recipient JWE
+modify the VerifyDecryptJOSE MPGW to decrypt this form of the JWE, and pass it on to the baggage service.
+
+Section 13. Test the JSON serialized, multi-recipient JWE decryption and call the back-end baggage service
+curl --data-binary @MultiRecipientJWE.txt http://192.168.1.75:13003/DecryptMultiRecipientJWE
+- decryption converts the JWE in the Body into {"refNumber" : 11111, "lastName" : "Johnson"}
+  which is the format the backend is expecting
+- returns application JSON
+
+Section 14. Generate a JSON serialized JWE with a signed payload
+
+Section 15. Test the JSON serialized JWE generation for a JWS
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignEncryptBody > SignedEncryptedJWE.txt
+- returns
+{"recipients":[{"header":{"kid":"Emi"},"encrypted_key":"r2CZl2lmfMj8Uy_1G5kfCJXhagCaZGY3HMmAT6oBtGic-YLy-XgxEzKAwAGgd8NZx8DNVrlSlmMKq6PX8Sw6AxU0CWVAOC4sO-DAWo0ErusTM6qDFR6YmbohYJ_NYZ9ny1j5DmrYfCThEBv1QRt54aqL3973VRnTlhhFqFWjLsdPPqadId-HJ-h7ADluvW7oEXZO-Jb0D17qqtIspPQT4oPw1qPxR1Y1m3JcfVked3cIlsMisxvMyfCLsCsIPV81iKi_osmWvQ59Ffbi4i82BWYnC7ivvdxKPh_EOOFlL6P8XwAno4qjGNAGnHbSKpJO0F2QyLfHUCH_KKCt9Ggipw"}],"protected":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBMV81In0","ciphertext":"aXbQZ6E5BiMGMkYmS9lkLYRiV3RtFsBM43tmvoI98j6rWiy5G6LqAIc573tLrZXHCC4haA3ILHHZYyNPjSF85oLlrQu91cKQJ8CbOljtP3rhkgl1uQQ1W3X84OcVGSq-_dkPDg6zEhJLxZxjmhIo_7-2L8ErnxHaQoyw44SXJxIq5wZphrrl0JZdg-vlMF7R0C7nqkzFY10ah17PevBy5OY2N9muyJnYpMsORUxpN3xSi9ICCPJ2AhIsfA6GFF5NtN3iMoLDiCj2TpljMh7OkkrPmdt0tqUwEgC_Q9YQHDaWgYDJ60IpkvqUYIVdHUdwADkzhXSy8yHR_TQHFgmlh7t9aaKueseVqSNd2dgXKE4oboxarpTKA8yLOB5wRBJyTsQcBb9F3NGhkqRIQYxDspjqAgUi-f4P00PBSku5PehxkDCNyWyHKffLbRntvX_kUylSVMtnSvsmpCgVvfvtPHYx9TFyqG-6x2b1_lFxfX_jWEthCSNFI3fRbvQEkv5MFMfkqYyfdYhT7vJ4L8-QQ_yZDw4nZVBSmkZ2DLEIDEtBZfeuJ_UkoRa3XZ-A_Pm3_pGqAemgY3HvbcVyQ3WxFZqqvOC-BWlUBJTMYyD_L1Y3apMPtBlF5jl218Lfh9eBkhyp0Fy8Km6X7vtI2aEoE2DMjiSm3qUxKROZ7zTvvQw","iv":"94YFG3StajVa5-q9p7UHSw","tag":"5yXyKG8zygFR8X_a5agBhw"}
+
+Section 16. Verify a JSON serialized JWS that is inside a JWE
+modify the VerifyDecryptJOSE MPGW to decrypt the JWE, then to verify the JWS, and pass it on to the baggage service.
+
+Section 17. Test the JSON serialized JWE decryption and JWS verification and call the back-end baggage service
+curl --data-binary @SignedEncryptedJWE.txt http://192.168.1.75:13003/DecryptVerifyBody
+JWE contains encrypted JWS as its payload. The JWE is decrypted into the JWS.
+The JWS is verified, and the decoded payload is sent to the back-end baggage service
+in the expected form {"refNumber" : 11111, "lastName" : "Johnson"}
+  which is the format the backend is expecting
+- returns application JSON
+
+=====================================================================================================
+Exercise 4. Using GatewayScript to work with a JWS and a JWE
+<SignEncryptJOSE_port>: 13nn1
+<VerifyDecryptJOSE_port>: 13nn3
+<GWS_XMLFW_port>: 13nn5
+Section 2. Create a JWS by using a GatewayScript
+
+cd ../JWSJWEGWS
+
+curl --data-binary @payload.json http://192.168.1.75:13005/JWSCompactSign > jwscompact.txt
+- returns
+eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbS1wcml2a2V5In0.eyJvbmUiOiJiYWxsb29uIiwgInR3byI6ImNvb2tpZXMiLCAidGhyZWUiOiJwYXJhZGVzIn0K.t_GHTh3rYlh2WSVaHves4qaNGO-1kKknzFI784eo5u-fLSqUh0vFd7FEZy9pbeLzTwT6GjlwaPnp5FRuPvnMS7ve6nl148H5jB8jlBkKMnOmAWZKHwrhPO4eXGiVR3-qR5_OxXNGetn9Ove6gDajrOqMiwncB_nZs6ntfY7mdZkSbw-X3eBRVXahAr5-qNm40GYmUh45xEBbCYx2-87XwH19QlnrDnYJglIb1GhlnLfmMSwLSzR8fP8rf4xb5yEpUTEvZZ64PVg1KfAMaK2WknnME6Szuyeh-qvBKEhejX6QfOYtHPD5BhuvDb8mFL-jm90wWOa0b7ir7qF8jiQmyQ
+
+Section 3. Use a GatewayScript to verify a signature in a JWS
+curl --data-binary @jwscompact.txt http://192.168.1.75:13005/JWSCompactVerify
+- returns {"one":"balloon", "two":"cookies", "three":"parades"}, the original pre-signed JSON
+If not valid:
+<env:Envelope><env:Body><env:Fault><faultcode>env:Client</faultcode><faultstring>The validate operation failed with the missing required Header Parameter: 'alg' (from client)</faultstring></env:Fault></env:Body></env:Envelope>
+
+Section 4. Use a GatewayScript to encrypt a payload
+*** _9 in the notes has the wrong URI ***
+curl --data-binary @payload.json http://192.168.1.75:13005/JWECompactEncrypt > jwecompact.txt
+- returns
+eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBMV81In0.ZRIJdR5tUq1pyggDby2NuyPa-2Hc0qoYrkEXmNWfKwlbtPcdx595jC4h3LfDcRR_ymgH4mjgzNzXZtUo-6ya0Lk05i-RDAToEyUxBba-USAzQwBwn69uEQ90TqThLmkn59paiwk4rJ8nqbguiZqAlD5I4EGmRRruv9vIuKyUjJFXaB_EOV1Ztl93LFL357wODXqmNbK-xHQqK1ewdZjV6yb2-mgc2JAgAUcTSa-FxPYGF6z-pQ2AfNOUqBs-GoNjDTS5-Q-OJJOmhVS_9BbtdHvHEF-XaFw3lXnJZkAdHauoRwete14J9rbZ4h4vegiaog_1nHZcCQEzLSTAtOH-xw.OpWxduGdRILAzRQYQSP7xQ.v7hqm2NfdJOimB1udInzmAIHtn79zF3_N0dJW6J1FsVBrc4XwkL2o7q8HZ7vmSq1EXkhXu8mqKWhsnVJn7F4Sg.fX-OMVRIL7z-TZLFK16qLQ
+
+Section 5. Use a GatewayScript to decrypt a payload in a JWE
+
+curl --data-binary @jwecompact.txt http://192.168.1.75:13005/JWECompactDecrypt
+- returns {"one":"balloon", "two":"cookies", "three":"parades"}, the original pre-encrypted JSON
