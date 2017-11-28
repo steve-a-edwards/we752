@@ -1,7 +1,7 @@
 WE752 Run Notes
-
+=====================================================================================================
 Exercise 1. Using DataPower to implement REST services
-
+------------------------------------------------------
 DataPower gateway to expose web services with JSON data and a REST interface.
 After completing this exercise, you should be able to:
 • Create a service policy to handle JSON and REST requests and responses
@@ -9,12 +9,11 @@ After completing this exercise, you should be able to:
 • Enable and use the CLI debugger
 • Define and use stylesheet parameters
 • Convert a SOAP response to a JSON-formatted data structure by using XQuery/JSONiq
-
 <dp_FLY_baggage_port> - 2068
 <dp_FLY_booking_port> - 9080
-
 <mpgw_baggage_port>: 12nn9
 listener port of the BaggageServiceProxy
+
 1.1. Initialize the lab environment
  Appendix B - SOAPUI test on existing services:
 - Web Service Test - Baggage
@@ -68,9 +67,13 @@ rule: BaggageServicePolicy_FindBag_Req
 rule: BaggageServicePolicy_FindBag_Resp / FindBag_Resp match
 
 1.12. Test the retrieval by bag ID
-
+=====================================================================================================
 Exercise 2. Creating and verifying a JWS
 ----------------------------------------
+After completing this exercise, you should be able to:
+• Configure a JSON Web Sign action to generate a compact serialized and a JSON serialized JWS
+• Configure a JSON Web Verify action to verify a compact serialized and a JSON serialized JWS
+
 Section 2. Test the back-end services
 This is BaggageServiceProxy on <mpgw_baggage_port>: 12nn9
 
@@ -162,6 +165,12 @@ curl --data-binary @SignedBodyMultiSigJSONJWS.txt http://192.168.1.75:13003/Veri
 
 =====================================================================================================
 Exercise 3. Creating and decrypting a JWE
+-----------------------------------------
+After completing this exercise, you should be able to:
+• Configure a JSON Web Encrypt action to generate a compact serialized and a JSON serialized JWE
+• Configure a JSON Web Verify action to verify a compact serialized and a JSON serialized JWS
+• Encrypt a JWS into the JWE, decrypt the JWE to get the JWS, and verify the JWS
+
 Section 2. Create a compact serialized JWE
 modify SignEncryptJOSE MPGW to create a compact serialized JWE.
 
@@ -241,6 +250,10 @@ Exercise 4. Using GatewayScript to work with a JWS and a JWE
 <SignEncryptJOSE_port>: 13nn1
 <VerifyDecryptJOSE_port>: 13nn3
 <GWS_XMLFW_port>: 13nn5
+After completing this exercise, you should be able to:
+• Use the JWSHeader, JWSSigner, and JWSVerifier classes to manipulate a JWS
+• Use the JWEHeader, JWEEncrypter, and JWEDecrypter classes to manipulate a JWE
+
 Section 2. Create a JWS by using a GatewayScript
 
 cd ../JWSJWEGWS
