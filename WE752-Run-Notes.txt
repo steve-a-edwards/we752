@@ -1,4 +1,5 @@
 WE752 Run Notes
+NOTE key cert files expire end May 2020 (see below).
 =====================================================================================================
 Exercise 1. Using DataPower to implement REST services
 ------------------------------------------------------
@@ -109,6 +110,8 @@ Seth-sscert.pem
 Simon-sscert.pem
 - expires 31/5/2020
 
+Import WE752CryptoMaterials.zip
+
 Section 4. Create a compact serialized JWS
 In this section, you create the SignEncryptJOSE MPGW / HTTP Handler: SignEncryptJOSE_http_13nn1
 
@@ -126,10 +129,8 @@ Irrelevant diagram under section __ 18
 
 VerifyDecryptJOSE MPGW / HTTP Handler: VerifyDecryptJOSE_http_13nn3
 
-
 *** _29. Specify a Rule Name of "Generic Response" and set the direction to Server to Client.
 - no space allowed in name use _ between
-
 
 Section 7. Test the compact serialized JWS verification and call the back-end baggage service
 OK:
