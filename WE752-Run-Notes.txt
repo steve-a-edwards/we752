@@ -20,6 +20,8 @@ listener port of the BaggageServiceProxy
 - 00 – Web Service Test - Booking
 
 1.2. Compare the REST interface to the SOAP interface of the back-end web service
+ERROR:
+"Currently, GET-type requests are supported only on the back-end web service" - should be POST.
 
 1.3. The high-level design of the REST service
 
@@ -34,12 +36,17 @@ Transform: REST/BaggageJson2Soap.js
 identity.xsl
 
 "__ 18. If the Transform action (“xformng”) is down ..." not such a problem on 7.5.2.2.
-
+ERROR:
+"__ 15. Add a Transform action that uses XQuery and JSONiq to convert the SOAP response to a JSON data structure"
+JSONiq is an extension of XQuery to allow processing of JSON.
 
 1.5. Test the BaggageServiceProxy by sending a JSON request
 * Ensure NOT using "SOAPUI Baggage REST GET"
 * In the response tab, be sure to click the JSON view tab.
 #queryJohnson  -OK
+NOTE: identity.xsl is not necessary, since the output is going straight to OUTPUT.
+If further processing was needed, could use the parse action, introduced in 7.6:
+https://www.ibm.com/support/knowledgecenter/SS9H2Y_7.6.0/com.ibm.dp.doc/action_addingparseaction.html
 
 1.6. Test the Validate action in BaggageServiceProxy
 #misslastname, #refNoString - both invalid
@@ -48,11 +55,16 @@ identity.xsl
 gatewayscript-user entries in log
 
 1.8. Use the CLI GatewayScript debugger
-ssh dp_internal_ip
-switch domain some student domain
-co
-show debug-actions (gives Session ID values, etc.)
-debug-action <session_id>
+ubuntu$ ssh dp_internal_ip
+idg# switch domain student01_domain
+idg[student01_domain]# show debug-actions
+		(gives Session ID values, etc.)
+idg[student01_domain]# co
+idg[student01_domain]#(config)# debug-action <session_id>
+(debug) n
+(debug) n
+(debug) c
+(debug) quit
 
 1.9. Add a REST interface to the baggage status request (i.e. wasn't a GET)
 - now no content, just URI
@@ -87,6 +99,15 @@ curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:12009/BaggageS
 - RefnumLastnameRequest.txt = {"refNumber" : 11111, "lastName" : "Johnson
 
 Section 3. Import the key material objects and files
+BEWARE:
+Emi-sscert.pem
+Sam-sscert.pem
+- expires 29/5/2020
+
+Erin-sscert.pem
+Seth-sscert.pem
+Simon-sscert.pem
+- expires 31/5/2020
 
 Section 4. Create a compact serialized JWS
 In this section, you create the SignEncryptJOSE MPGW / HTTP Handler: SignEncryptJOSE_http_13nn1
