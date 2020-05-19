@@ -258,6 +258,7 @@ curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignEncr
 
 Section 16. Verify a JSON serialized JWS that is inside a JWE
 modify the VerifyDecryptJOSE MPGW to decrypt the JWE, then to verify the JWS, and pass it on to the baggage service.
+__13. Strip the signature so that the output is the original payload. - NOTHING NEEDS TO BE ADDED!
 
 Section 17. Test the JSON serialized JWE decryption and JWS verification and call the back-end baggage service
 curl --data-binary @SignedEncryptedJWE.txt http://192.168.1.75:13003/DecryptVerifyBody
