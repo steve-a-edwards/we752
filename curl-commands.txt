@@ -1,0 +1,79 @@
+Exercise 2.
+2.1
+
+export dp_public_ip=192.168.1.175
+curl -G "http://$dp_public_ip:12019/BaggageService/Passenger/Bags?refNumber=11111&lastName=Johnson"
+
+
+curl --data-binary @RefnumLastnameRequest.txt http://$dp_public_ip:12019/BaggageService
+
+Section 5
+curl --data-binary @URIstring.txt http://$dp_public_ip:13011/SignURIcompact > SignedURIcompactJWS.txt
+
+curl -G "http://$dp_public_ip:13013/VerifyURIcompact?eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA"
+
+
+Section 9
+curl --data-binary @RefnumLastnameRequest.txt http://$dp_public_ip:13011/SignBodyJSON > SignedBodyJSONJWS.txt
+
+Section 11
+curl --data-binary @SignedBodyJSONJWS.txt http://$dp_public_ip:13013/VerifyBodyJSON
+
+Section 13
+curl --data-binary @RefnumLastnameRequest.txt http://$dp_public_ip:13011/SignBodyMultiSigJSON > SignedBodyMultiSigJSONJWS.txt
+
+Section 15
+curl --data-binary @SignedBodyMultiSigJSONJWS.txt http://$dp_public_ip:13013/VerifyBodyMultiSigJSON
+
+Emi-sscert.pem
+Sam-sscert.pem
+- expires 29/5/2020
+
+Erin-sscert.pem
+Seth-sscert.pem
+Simon-sscert.pem
+- expires 31/5/2020
+
+
+Exercise 3
+Section 3
+curl --data-binary @URIstring.txt http://$dp_public_ip:13011/EncryptURIcompact > EncryptedURIcompactJWE.txt
+
+Section 5
+curl -G "http://$dp_public_ip:13013/DecryptURIcompact?eyJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiRW1pIiwiYWxnIjoiUlNBMV81In0.W8j6pAfwU0PFoBlH2nwjscfJC2726txJvbyebkBMtLecvlMwyKBeUDBqQXmrm1I9nzERuzEkRmFgj5sT2kfCG59iu7RnCkid-CNQDU7eKcIbDVGTxAFoBoAkGWB0DJdyxuk51NdVqSaK1V5AjmDi2qzCPW2rX34bL73_1F1vJj67Osd8kOgjRgQzrauDCu3fjpa1UAVtYaTbeadXlEknYpnfeDjOKZ8ZAt3RNmZTk7lODTWH5fzm5aEMEY93zKwpPfdJhiZz-xtIvKo3WAWVIvGwNbnxJllUn-tysv8BwNwC5yMMjgsEvQEKqL6gjxRDkz8sGxLmA0vKXBE9q6T3Fg.cfmlMzO4qtuJJ4un4mHbRQ.S_-jJIA91m8Sbka3sULBGy4Y-fFbpDgn9SNou9eAzcD0JdT3LFmEfd9b1mrkQx3z.O1V9psKGYOPXdqP5m1t4GQ"
+
+Section 7
+curl --data-binary @RefnumLastnameRequest.txt http://$dp_public_ip:13011/EncryptBodyJSON > EncryptedBodyJSONJWE.txt
+
+Section 9
+curl --data-binary @EncryptedBodyJSONJWE.txt http://$dp_public_ip:13013/DecryptBodyJSON
+
+Section 11
+curl --data-binary @RefnumLastnameRequest.txt http://$dp_public_ip:13011/BuildMultiRecipientJWE > MultiRecipientJWE.txt
+
+Section 13
+curl --data-binary @MultiRecipientJWE.txt http://$dp_public_ip:13013/DecryptMultiRecipientJWE
+
+Section 15
+curl --data-binary @RefnumLastnameRequest.txt http://$dp_public_ip:13011/SignEncryptBody > SignedEncryptedJWE.txt
+
+Section 17
+curl --data-binary @SignedEncryptedJWE.txt http://$dp_public_ip:13013/DecryptVerifyBody
+
+Exercise 4
+Can use files in /home/localuser/Desktop/DPLabs/dp/JWSJWESetup/backupGWS
+
+Section 2
+curl -–data-binary @payload.json http://$dp_public_ip:13015/JWSCompactSign > jwscompact.txt
+
+Section 3
+curl --data-binary @jwscompact.txt http://$dp_public_ip:13015/JWSCompactVerify
+
+Section 4
+Use EncryptCompactJWE.js in above folde (not CreateCompactJWE.js as in exercise notes)
+curl --data-binary @payload.json http://$dp_public_ip:13015/JWECompactEncrypt > jwecompact.txt
+
+Section 5
+curl --data-binary @jwecompact.txt http://$dp_public_ip:13015/JWECompactDecrypt
+
+

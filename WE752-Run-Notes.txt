@@ -277,6 +277,8 @@ After completing this exercise, you should be able to:
 • Use the JWSHeader, JWSSigner, and JWSVerifier classes to manipulate a JWS
 • Use the JWEHeader, JWEEncrypter, and JWEDecrypter classes to manipulate a JWE
 
+(Can use the solution files in folder JWSJWESetup/backupGWS.)
+
 Section 2. Create a JWS by using a GatewayScript
 
 cd ../JWSJWEGWS
