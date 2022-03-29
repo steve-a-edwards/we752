@@ -18,7 +18,7 @@ listener port of the BaggageServiceProxy
 1.1. Initialize the lab environment
  Appendix B - SOAPUI test on existing services:
 - Web Service Test - Baggage
-- 00 – Web Service Test - Booking
+- 00 - Web Service Test - Booking
 
 1.2. Compare the REST interface to the SOAP interface of the back-end web service
 ERROR:
@@ -36,7 +36,7 @@ Validate:  REST/BaggageStatus-schema.json.
 Transform: REST/BaggageJson2Soap.js
 identity.xsl
 
-"__ 18. If the Transform action (“xformng”) is down ..." not such a problem on 7.5.2.2.
+"__ 18. If the Transform action ("xformng") is down ..." not such a problem on 7.5.2.2.
 ERROR:
 "__ 15. Add a Transform action that uses XQuery and JSONiq to convert the SOAP response to a JSON data structure"
 JSONiq is an extension of XQuery to allow processing of JSON.
@@ -50,10 +50,11 @@ If further processing was needed, could use the parse action, introduced in 7.6:
 https://www.ibm.com/support/knowledgecenter/SS9H2Y_7.6.0/com.ibm.dp.doc/action_addingparseaction.html
 
 1.6. Test the Validate action in BaggageServiceProxy
-#misslastname, #refNoString - both invalid
+#misslastname, #refNoString - both invalid (as expected)
 
 1.7. Use the stylesheet parameter in the GatewayScript action
 gatewayscript-user entries in log
+ALternatives to using GWS parameter included testing on HTTP header sent by the client.
 
 1.8. Use the CLI GatewayScript debugger
 ubuntu$ ssh dp_internal_ip
@@ -111,6 +112,9 @@ Simon-sscert.pem
 - expires 31/5/2020
 
 Import WE752CryptoMaterials.zip
+- export containing references to Crypto objects
+- can be seen through the Ubuntu desktop contains objects, but no files!
+- no JKS files in my Ubuntu WE752 image
 
 Section 4. Create a compact serialized JWS
 In this section, you create the SignEncryptJOSE MPGW / HTTP Handler: SignEncryptJOSE_http_13nn1
@@ -220,7 +224,7 @@ Section 7. Test the JSON serialized JWE generation
 curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/EncryptBodyJSON > EncryptedBodyJSONJWE.txt
 - returns
 {"recipients":[{"header":{"kid":"Emi"},"encrypted_key":"XE6Ai12VBtWxXcO0LHD558CpE3DoN9o1udBc3f9U4JjfOhJVbViDmpODNuu8zsbeYOwCb26YLCpv1i7sxT1GCATZpJoa0VOCl08axjR9F_TSMfdyvknXBCmiT1d3Oq-dFB-Dcj_Auty47YGjR86y-W6Mum4gdriWGSyAbDRHjDurax4XrWd9E5PUC4YwZ8VYC72yFKeuOga53prAqSCfHIx1kEci4M0UM06NdygkVY9X7y_l4Rs-_XGExebFsDOgctVp1Tb8vifRgkcXlFlQXs4pmjNLXejYfpOS4xsnhsG_tsNx2UzgdsjfPiSX9ray08E2o6gBqNsD6ZCtWGmgvQ"}],"protected":"eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiUlNBMV81In0","ciphertext":"LI-voLRjxU5JvZwjzaQ0c2bUf40objeCAk_hyT_-u6rXbDMEvfDXj8hA5uFj1lpoR8osVILtagtOODowKlhBqA","iv":"lDI3J_pVOBQyC9I4efaTgA","tag":"j6bCqYR0Eh70yrw04Cbiww"}
-"The protected header decodes as “{"enc":"A128CBC-HS256","alg":"RSA1_5"}”, is actually the "protected" value.
+"The protected header decodes as "{"enc":"A128CBC-HS256","alg":"RSA1_5"}", is actually the "protected" value.
 
 Section 8. Decrypt a JSON serialized, single-recipient JWE
 
