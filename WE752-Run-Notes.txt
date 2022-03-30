@@ -93,14 +93,19 @@ This is BaggageServiceProxy on <mpgw_baggage_port>: 12nn9
 
 cd /usr/labfiles/dp/JWS
 
-2.2 Use cURL to test the REST-based GET request
+2.2 Use cURL to test the REST-based GET request:
 curl -G "http://192.168.1.75:12009/BaggageService/Passenger/Bags?refNumber=11111&lastName=Johnson"
+curl -G "http://192.168.1.165:12019/BaggageService/Passenger/Bags?refNumber=11111&lastName=Johnson"
 
-2.3 Use cURL to test the POST request that passes a JSON object
+2.3 Use cURL to test the POST request that passes a JSON object:
 curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:12009/BaggageService
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.165:12019/BaggageService
+
 - RefnumLastnameRequest.txt = {"refNumber" : 11111, "lastName" : "Johnson
 
 Section 3. Import the key material objects and files
+2022-03-30 Created following objects and files from scratch to expire 2032.
+
 BEWARE:
 Emi-sscert.pem
 Sam-sscert.pem
