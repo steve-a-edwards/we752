@@ -105,6 +105,9 @@ curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.165:12019/Baggage
 
 Section 3. Import the key material objects and files
 2022-03-30 Created following objects and files from scratch to expire 2032.
+Original PEM files in <lab_files>/JWSJWEsetup have key / certs which have expired.
+Need to download ones from folder in this Github repo folder updated-crypto-objects-files.
+Can still use the ZIP file <lab_files>/JWSJWEsetup/WE752CryptoMaterials.zip
 
 BEWARE:
 Emi-sscert.pem
@@ -124,8 +127,10 @@ Import WE752CryptoMaterials.zip
 Section 4. Create a compact serialized JWS
 In this section, you create the SignEncryptJOSE MPGW / HTTP Handler: SignEncryptJOSE_http_13nn1
 
-Section 5. Test the compact serialized JWS generation
+Section 5. Test the compact serialized JWS generation:
 curl --data-binary @URIstring.txt http://192.168.1.75:13001/SignURIcompact > SignedURIcompactJWS.txt
+curl --data-binary @URIstring.txt http://192.168.1.165:13011/SignURIcompact > SignedURIcompactJWS.txt
+
 =
 eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA
 - base64 decode (dot separates three sections):
@@ -144,6 +149,8 @@ VerifyDecryptJOSE MPGW / HTTP Handler: VerifyDecryptJOSE_http_13nn3
 Section 7. Test the compact serialized JWS verification and call the back-end baggage service
 OK:
 curl -G "http://192.168.1.75:13003/VerifyURIcompact?eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA"
+curl -G "http://192.168.1.165:13013/VerifyURIcompact?eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.CMCAYMOE_4KfOkRCzSJEFEGPNKg1s5eSIOWuZogQ0ITV9nBxGNJ1EbANqq49MV_RtHaj5El0mZ-N-K55wLII-o1XdRMuhUdJzRgRgrch3XULffgdjhkB4gfQMpS_JaAAtzSRTvZ6-UwAf9DlwWiQJrWrvGEcZVyQ4NDx8NTo4CHZ--TsU58kBEqIc8Tx7c7EigVpzeoiiP3xB-2Uh_AP1tjEc8py-tDFjx_ROxzhcYzYLUcPfCt3pNy6zzdyXkJn8D8X6ltSFQFLcKsJqCA0pDIviReUqZGP4Ikd0NRAlTMLO4D_DZxmx2uFAtVXdlz7V0jhu4ErRy6eZoT95CmTJg"
+
 - returns with application JSON result
 NOT OK:
 curl -G "http://192.168.1.75:13003/VerifyURIcompact?eyJhbGciZZZSUzI1NiIsImtpZCI6IlNhbSJ9.cmVmTnVtYmVyPTExMTExJmxhc3ROYW1lPUpvaG5zb24.MVg8FO7zaetjqijf22xdpy4xYDvqH2JB-gixxh3mkahTbOJkXVq6h_gk9dQf4bp7ErtWQXiZNaQfn-Sw7ag5ntTLM2sXVW51xIQqKCUkX8DKfzq_p8W0GwW8UnXKBZNaTppgwZFmDu_9fFbx-mjo4qYtcWCr-X4XDpg8UzGZSZG2ZseBLH4crr9sKiRw4Zv8C0di_-BYfcKZQ8YniTFae5zr91yHT_9ndTkAp_DgTdZlibuyrK9MgCnChBhVIxATUo8Kje7pQkTeEaUB5Kut3-1DTv5OAz1LzkicutQTdWN1qpORtgIz2yfypzWp3lj_HR4nfVlD64-CWEm8jOmDxA"
@@ -155,6 +162,8 @@ modify SignEncryptJOSE MPGW to create a JSON serialized JWS.
 
 Section 9. Test the JSON serialized JWS generation
 curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignBodyJSON > SignedBodyJSONJWS.txt
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.165:13011/SignBodyJSON > SignedBodyJSONJWS.txt
+
 
 {"payload":"ew0KICAicmVmTnVtYmVyIiA6IDExMTExLA0KICAibGFzdE5hbWUiIDogIkpvaG5zb24iDQp9","signatures":[{"protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9","signature":"eyCZRK5FbQYmw_xpVVUqTfSWQFATgH1bk4dFjVnH2jXkZta4tRRaLdB-hQvjWBCzWliAej3aVgAF01pyKYGlUD1eKYWYvf2M4V5VJrp-ZjdXRR0SA_Fvk4U-D233VHKKhYHWfD_upMYtaTzVTY1F7n2v0XtgtSFDzPzXWXtnaNowjBxIrttl1-JCu5yFdIWUdM7pLJEGuKRWVzn1420myE4rdRtCqWOmGiIfmpno6VTmxmZIc7VMtArgwsuXcp1sGkyi_i9pxdDYYYv06khkjx_WIGl6jhGTbCnK81n1exYxcL7skGIDsVy0RClSksyVld6e4nozCK_EwwawuqJRDA"}]}
             xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx = base64 encoded of {"refNumber" : 11111, "lastName" : "Johnson"}
@@ -164,8 +173,10 @@ curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignBody
 Section 10. Verify a JSON serialized, single signature JWS
 modify VerifyDecryptJOSE MPGW to verify this form of the JWS
 
-Section 11. Test the JSON serialized JWS verification and call the back-end baggage service
+Section 11. Test the JSON serialized JWS verification and call the back-end baggage service:
 curl --data-binary @SignedBodyJSONJWS.txt http://192.168.1.75:13003/VerifyBodyJSON
+curl --data-binary @SignedBodyJSONJWS.txt http://192.168.1.165:13013/VerifyBodyJSON
+
 - verification action converts the {"payload": "xxx", "signatures": "xxx"} into {"refNumber" : 11111, "lastName" : "Johnson"}
   which is the format the backend is expecting
 - returns application JSON
@@ -174,8 +185,10 @@ Section 12. Generate a JSON serialized JWS with multiple signatures
 modify SignEncryptJOSE MPGW to create a JSON serialized JWS with two signatures.
 The JSON Web Sign action does not support multiple signatures, a GatewayScript provides the function.
 
-Section 13. Test the JSON serialized JWS generation for multiple signatures
+Section 13. Test the JSON serialized JWS generation for multiple signatures:
 curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.75:13001/SignBodyMultiSigJSON > SignedBodyMultiSigJSONJWS.txt
+curl --data-binary @RefnumLastnameRequest.txt http://192.168.1.165:13011/SignBodyMultiSigJSON > SignedBodyMultiSigJSONJWS.txt
+
 {"payload":"ew0KICAicmVmTnVtYmVyIiA6IDExMTExLA0KICAibGFzdE5hbWUiIDogIkpvaG5zb24iDQp9",
     "signatures":[
         {"protected":"eyJhbGciOiJSUzI1NiIsImtpZCI6IlNhbSJ9","signature":"eyCZRK5FbQYmw_xpVVUqTfSWQFATgH1bk4dFjVnH2jXkZta4tRRaLdB-hQvjWBCzWliAej3aVgAF01pyKYGlUD1eKYWYvf2M4V5VJrp-ZjdXRR0SA_Fvk4U-D233VHKKhYHWfD_upMYtaTzVTY1F7n2v0XtgtSFDzPzXWXtnaNowjBxIrttl1-JCu5yFdIWUdM7pLJEGuKRWVzn1420myE4rdRtCqWOmGiIfmpno6VTmxmZIc7VMtArgwsuXcp1sGkyi_i9pxdDYYYv06khkjx_WIGl6jhGTbCnK81n1exYxcL7skGIDsVy0RClSksyVld6e4nozCK_EwwawuqJRDA"},
@@ -188,8 +201,10 @@ Section 14. Verify a JSON serialized, multi-signature JWS
 modify VerifyDecryptJOSE MPGW to verify this form of the JWS
 - add also a new Signature Identifier SethSig
 
-Section 15. Test the JSON serialized, multi-signature JWS verification and call the back-end baggage service
+Section 15. Test the JSON serialized, multi-signature JWS verification and call the back-end baggage service:
 curl --data-binary @SignedBodyMultiSigJSONJWS.txt http://192.168.1.75:13003/VerifyBodyMultiSigJSON
+curl --data-binary @SignedBodyMultiSigJSONJWS.txt http://192.168.1.165:13013/VerifyBodyMultiSigJSON
+
 - verification action converts the {"payload": "xxx", "signatures": "xxx"} into {"refNumber" : 11111, "lastName" : "Johnson"}
   which is the format the backend is expecting
 - returns application JSON
